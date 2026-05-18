@@ -20,8 +20,111 @@ reader = easyocr.Reader(
     gpu=True
 )
 
+# ---------------- EXIBIR IMAGEM ----------------
+def show_image_webcam(img, panel, width=640, height=480):
+    img_rgb = cv2.cvtColor(
+        img,
+        cv2.COLOR_BGR2RGB
+    )
 
-# ---------------- DETECÇÃO ----------------
+    img_resized = cv2.resize(
+        img_rgb,
+        (width, height)
+    )
+
+    img_pil = Image.fromarray(img_resized)
+    img_tk = ImageTk.PhotoImage(image=img_pil)
+
+    panel.imgtk = img_tk
+    panel.config(image=img_tk)
+
+
+# WEBCAM
+def start_detection(panel, label, cap):
+    global running
+    global frame_count
+    global ultimo_texto
+
+    if not running:
+        return
+
+    ret, frame = cap.read()
+
+    if ret:
+        frame_count += 1
+
+        # OCR a cada 10 frames
+        fazer_ocr = frame_count % 5 == 0
+
+        annotated, textos = detectar_placa_webcam(
+            frame,
+            fazer_ocr=fazer_ocr
+        )
+
+        show_image_webcam(annotated, panel)
+
+        if ultimo_texto:
+            label.config(
+                text=f"Última placa: {ultimo_texto}"
+            )
+        else:
+            label.config(
+                text="Nenhuma placa detectada"
+            )
+
+    root.after(
+        15,
+        start_detection,
+        panel,
+        label,
+        cap
+    )
+
+def open_webcam_window():
+    global running
+    running = True
+
+    cap = cv2.VideoCapture(0)
+
+    # resolução menor = mais leve
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
+    webcam_win = tk.Toplevel(root)
+    webcam_win.title(
+        "Webcam - Detecção de Placas"
+    )
+
+    panel = tk.Label(webcam_win)
+    panel.pack(
+        fill="both",
+        expand=True
+    )
+
+    label = tk.Label(
+        webcam_win,
+        text="Placa detectada:",
+        bg="lightgray"
+    )
+    label.pack(pady=10)
+
+    btn_stop = tk.Button(
+        webcam_win,
+        text="Parar Webcam",
+        command=lambda: stop_detection(cap)
+    )
+    btn_stop.pack(
+        side="left",
+        padx=10,
+        pady=10
+    )
+
+    start_detection(
+        panel,
+        label,
+        cap
+    )
+
 def detectar_placa_webcam(img, fazer_ocr=True):
     global ultimo_texto
 
@@ -61,7 +164,7 @@ def detectar_placa_webcam(img, fazer_ocr=True):
                 continue
 
             try:
-                # ---------------- PREPROCESSAMENTO ----------------
+                # PREPROCESSAMENTO 
                 gray = cv2.cvtColor(
                     placa_crop,
                     cv2.COLOR_BGR2GRAY
@@ -140,118 +243,43 @@ def detectar_placa_webcam(img, fazer_ocr=True):
     return annotated, textos
 
 
-# ---------------- EXIBIR IMAGEM ----------------
-def show_image_webcam(img, panel, width=640, height=480):
-    img_rgb = cv2.cvtColor(
-        img,
-        cv2.COLOR_BGR2RGB
-    )
+# Imagens
+def open_image_window(img):
 
-    img_resized = cv2.resize(
-        img_rgb,
-        (width, height)
-    )
-
-    img_pil = Image.fromarray(img_resized)
-    img_tk = ImageTk.PhotoImage(image=img_pil)
-
-    panel.imgtk = img_tk
-    panel.config(image=img_tk)
-
-
-# ---------------- WEBCAM ----------------
-def start_detection(panel, label, cap):
-    global running
-    global frame_count
-    global ultimo_texto
-
-    if not running:
+    if img is None:
+        print("Imagem não encontrada")
         return
 
-    ret, frame = cap.read()
+    annotated, textos = detectar_placa_img(img)
 
-    if ret:
-        frame_count += 1
-
-        # OCR a cada 10 frames
-        fazer_ocr = frame_count % 5 == 0
-
-        annotated, textos = detectar_placa_webcam(
-            frame,
-            fazer_ocr=fazer_ocr
-        )
-
-        show_image_webcam(annotated, panel)
-
-        if ultimo_texto:
-            label.config(
-                text=f"Última placa: {ultimo_texto}"
-            )
-        else:
-            label.config(
-                text="Nenhuma placa detectada"
-            )
-
-    root.after(
-        15,
-        start_detection,
-        panel,
-        label,
-        cap
+    image_win = tk.Toplevel(root)
+    image_win.title(
+        "Imagem - Detecção de Placas"
     )
 
-
-def stop_detection(cap):
-    global running
-    running = False
-    cap.release()
-
-
-def open_webcam_window():
-    global running
-    running = True
-
-    cap = cv2.VideoCapture(0)
-
-    # resolução menor = mais leve
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-
-    webcam_win = tk.Toplevel(root)
-    webcam_win.title(
-        "Webcam - Detecção de Placas"
-    )
-
-    panel = tk.Label(webcam_win)
+    panel = tk.Label(image_win)
     panel.pack(
         fill="both",
         expand=True
     )
 
-    label = tk.Label(
-        webcam_win,
-        text="Placa detectada:",
-        bg="lightgray"
-    )
-    label.pack(pady=10)
-
-    btn_stop = tk.Button(
-        webcam_win,
-        text="Parar Webcam",
-        command=lambda: stop_detection(cap)
-    )
-    btn_stop.pack(
-        side="left",
-        padx=10,
-        pady=10
+    show_image(
+        annotated,
+        panel
     )
 
-    start_detection(
-        panel,
-        label,
-        cap
-    )
-
+    if textos:
+        tk.Label(
+            image_win,
+            text=f"Placa detectada: {', '.join(textos)}",
+            bg="lightgray"
+        ).pack(pady=10)
+    else:
+        tk.Label(
+            image_win,
+            text="Nenhuma placa lida",
+            bg="lightgray"
+        ).pack(pady=10)
 
 def detectar_placa_img(img):
     results = model(img, conf=CONF_THRESHOLD)
@@ -298,7 +326,6 @@ def detectar_placa_img(img):
 
     return annotated, textos
 
-
 def show_image(img, panel, max_width=800, max_height=600):
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img_pil = Image.fromarray(img_rgb)
@@ -313,48 +340,15 @@ def show_image(img, panel, max_width=800, max_height=600):
 
     panel.imgtk = img_tk
     panel.config(image=img_tk)
+      
+
+def stop_detection(cap):
+    global running
+    running = False
+    cap.release()
 
 
-# ---------------- IMAGEM ----------------
-def open_image_window(img):
-
-    if img is None:
-        print("Imagem não encontrada")
-        return
-
-    annotated, textos = detectar_placa_img(img)
-
-    image_win = tk.Toplevel(root)
-    image_win.title(
-        "Imagem - Detecção de Placas"
-    )
-
-    panel = tk.Label(image_win)
-    panel.pack(
-        fill="both",
-        expand=True
-    )
-
-    show_image(
-        annotated,
-        panel
-    )
-
-    if textos:
-        tk.Label(
-            image_win,
-            text=f"Placa detectada: {', '.join(textos)}",
-            bg="lightgray"
-        ).pack(pady=10)
-    else:
-        tk.Label(
-            image_win,
-            text="Nenhuma placa lida",
-            bg="lightgray"
-        ).pack(pady=10)
-
-
-# ---------------- MENU PRINCIPAL ----------------
+# Menuzin
 root = tk.Tk()
 root.title("Sistema de Detecção de Placas")
 
