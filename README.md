@@ -1,65 +1,86 @@
-Aqui está um **README.md pronto** para você copiar e colar no seu GitHub:
+Sistema de Detecção de Placas 🚗🔍
+Este projeto combina YOLOv8 e EasyOCR para detectar e reconhecer placas de veículos em imagens e em tempo real via webcam.
+Além disso, inclui um conjunto de ferramentas de processamento de imagens (histograma, bordas, cores, segmentação, estatísticas) acessíveis por uma interface gráfica feita em Tkinter.
 
----
+🚀 Funcionalidades
+Webcam: detecção de placas em tempo real, com OCR integrado.
 
-# Sistema de Detecção de Placas 🚗🔍
+Imagem Placa Velha / Nova: reconhecimento em imagens pré-definidas (carro1.jpg, carro2.jpg).
 
-Este projeto utiliza **YOLOv8** e **EasyOCR** para detectar e reconhecer placas de veículos em imagens, vídeos e webcam.  
-A interface gráfica foi construída com **Tkinter** para facilitar o uso.
+Histograma: exibe histograma de intensidade da imagem.
 
-## 🚀 Funcionalidades
-- Detecção de placas em **tempo real** via webcam.  
-- Reconhecimento de placas em **imagens estáticas**.  
-- Possibilidade de rodar em **vídeos gravados** (basta adaptar o `VideoCapture`).  
-- Interface gráfica simples com botões para escolher o modo de operação.  
+Análise de Cores (HSV): mostra canais de cor e detecta regiões vermelhas, azuis e verdes.
 
-## 🛠️ Tecnologias utilizadas
-- [OpenCV](https://opencv.org/) – captura e manipulação de imagens/vídeos.  
-- Ultralytics YOLOv8 [(github.com in Bing)](https://www.bing.com/search?q="https%3A%2F%2Fgithub.com%2Fultralytics%2Fultralytics") – modelo de detecção de objetos.  
-- [EasyOCR](https://github.com/JaidedAI/EasyOCR) – reconhecimento óptico de caracteres.  
-- Tkinter [(docs.python.org in Bing)](https://www.bing.com/search?q="https%3A%2F%2Fdocs.python.org%2F3%2Flibrary%2Ftkinter.html") – interface gráfica.  
-- [Pillow](https://python-pillow.org/) – manipulação de imagens para exibição.  
+Detecção de Bordas: aplica Canny para destacar bordas.
 
-## 📦 Requisitos
+Brilho / Contraste: ajusta parâmetros da imagem e exibe comparação.
+
+Segmentação: aplica threshold simples e adaptativo.
+
+Estatísticas da Imagem: calcula média, máximo e mínimo de intensidade.
+
+Interface gráfica: botões organizados em um menu para acessar cada funcionalidade.
+
+OCR inteligente: valida padrões de placas brasileiras (antigo e Mercosul).
+
+🛠️ Tecnologias utilizadas
+OpenCV – captura e processamento de imagens/vídeos.
+
+Ultralytics YOLOv8 (github.com in Bing) – modelo de detecção de objetos.
+
+EasyOCR – reconhecimento óptico de caracteres.
+
+Tkinter (docs.python.org in Bing) – interface gráfica.
+
+Pillow – manipulação de imagens para exibição.
+
+Matplotlib – visualização de histogramas e gráficos.
+
+NumPy – operações matemáticas e estatísticas.
+
+📦 Requisitos
 Instale as dependências com:
-```bash
-pip install ultralytics opencv-python easyocr pillow
-```
 
-> ⚠️ Observação: o código roda em **CPU**, mas terá desempenho muito melhor se você tiver **GPU CUDA** disponível.
+bash
+pip install ultralytics opencv-python easyocr pillow matplotlib numpy
+⚠️ Observação: o código roda em CPU por padrão, mas terá desempenho muito melhor se você tiver GPU CUDA disponível.
 
-## ▶️ Como usar
-1. Clone este repositório:
-   ```bash
-   git clone https://github.com/seuusuario/sistema-deteccao-placas.git
-   cd sistema-deteccao-placas
-   ```
-2. Coloque o arquivo do modelo YOLO (`license_plate_detector.pt`) na pasta do projeto.  
-3. Execute o programa:
-   ```bash
-   python main.py
-   ```
-4. Use os botões da interface:
-   - **Webcam** → abre a câmera e detecta placas em tempo real.  
-   - **Imagem Placa Velha / Nova** → roda a detecção em imagens pré-definidas.  
-   - **Vídeo** → pode ser adaptado para processar arquivos `.mp4`.  
-   - **Sair** → fecha o programa.  
+▶️ Como usar
+Clone este repositório:
 
-## 📹 Extensão para vídeos
+bash
+git clone https://github.com/Augusto-code-dev/De-Yolo-Na-Placa.git
+cd sistema-deteccao-placas
+Coloque o arquivo do modelo YOLO (license_plate_detector.pt) na pasta do projeto.
+
+Execute o programa:
+
+bash
+python main.py
+Use os botões da interface para escolher a funcionalidade desejada:
+
+Webcam → abre a câmera e detecta placas em tempo real.
+
+Imagem Placa Velha / Nova → roda a detecção em imagens pré-definidas.
+
+Histograma / Bordas / Cores / Brilho / Segmentação / Estatísticas → ferramentas de análise de imagem.
+
+Sair → fecha o programa.
+
+📹 Extensão para vídeos
 Para rodar em vídeos, basta substituir:
-```python
+
+python
 cap = cv2.VideoCapture(0)
-```
 por:
-```python
+
+python
 cap = cv2.VideoCapture("meu_video.mp4")
-```
 
 ## 📚 Créditos
 Este projeto utiliza o modelo YOLOv8 para detecção de placas, baseado no trabalho de Muhammad Zeerak Khan [(github.com in Bing)](https://www.bing.com/search?q="https%3A%2F%2Fgithub.com%2FMuhammad-Zeerak-Khan%2FAutomatic-License-Plate-Recognition-using-YOLOv8").  
 O OCR foi feito com [EasyOCR](https://github.com/JaidedAI/EasyOCR).  
 A interface gráfica e integração com webcam/imagens/vídeos foram adaptadas neste projeto.
 
-## 📄 Licença
-Este projeto é distribuído sob a licença MIT.  
-
+📄 Licença
+Este projeto é distribuído sob a licença MIT.
