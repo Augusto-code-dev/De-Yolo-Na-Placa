@@ -217,14 +217,14 @@ def detectar_placa_webcam(img, fazer_ocr=False):
                             texto_detectado
                         )
 
-                        # ignora textos inválidos
+                        # ignora textos invalidos
                         if texto_detectado in ["BRASIL", "MERCOSUL"]:
                             continue
 
-                        # padrão Mercosul
+                        # padrao Mercosul
                         padrao_mercosul = r'^[A-Z]{3}[0-9][A-Z][0-9]{2}$'
 
-                        # padrão antigo
+                        # padrao antigo
                         padrao_antigo = r'^[A-Z]{3}[0-9]{4}$'
 
                         if (
